@@ -1,28 +1,83 @@
 ---
-title: "deliverable1"
+title: "Deliverable 1"
+author: "Carlson Smith"
+date: "10/15/2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
 ```
 
-## R Markdown
+# Introduction
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+In this project I will be studying fires, electronic, climate change, and more
+with their effects on carbon emissions on earth.  Using these predictions or 
+data I will try to look to the future as well and see if those correlations can 
+be used to predict temperatures.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+The Domains I will specifically be looking into are:
 
-```{r cars}
-summary(cars)
+* Fire Emissions
+* Fire frequency
+* Temperature History
+* Carbon Emissions
+* Clean Energy
+* Electrical Usage
+
+# Data Set
+
+```{r}
+co2.data <- read_csv("owid-co2-data.xlsx.csv")
+head(co2.data)
 ```
+This data comes from https://github.com/owid/co2-data that is maintained by Our World in Data. It is updated regularly and includes data on CO2 emissions along with other helpful metrics.
 
-## Including Plots
+The Columns for this cut down data set are:
 
-You can also embed plots, for example:
+* iso_code - 	ISO 3166-1 alpha-3 – three-letter country codes
+* country- Geographic location
+* year - Year of observation
+* co2 - Annual production-based emissions of carbon dioxide (CO2), measured in million tonnes per year.
+* co2_growth_prct - Percentage change in CO2 emissions from one year relative to the previous year.
+* co2_growth_abs - 	Annual change in CO2 emissions from one year relative to the previous year, measured in million tonnes.
+* share_global_co2 - National or regional annual CO2 emissions, measured as a percentage of the global total
+* cumulative_co2 - Cumulative emissions of CO2 from 1751 through to the given year, measured in million tonnes.
+* share_global_cumulative_co2 - National or regional annual cumulative CO2 emissions, measured as a share of the global total
+* cement_co2 - CO2 emissions from cement production, measured in million tonnes.
+* coal_co2 - CO2 emissions from coal production, measured in million tonnes.
+* flaring_co2 - CO2 emissions from gas flaring, measured in million tonnes.
+* gas_co2	- CO2 emissions from gas production, measured in million tonnes.
+* oil_co2 - CO2 emissions from oil production, measured in million tonnes.
+* population - Total population
+* gdp - Total real gross domestic product, inflation-adjusted
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+This graph shows the carbon emissions for countries based on the year.
+```{r}
+ggplot(data = co2.data, mapping = aes(x=year, y=co2))+
+  geom_point(alpha = 0.2)
 ```
+You can see an explosive growth in the 1970's with some countries climbing higher than others.
+This data is just a base line to work with for future comparisons and predictions
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
