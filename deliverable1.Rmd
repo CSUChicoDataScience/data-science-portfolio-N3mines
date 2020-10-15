@@ -53,13 +53,13 @@ The continuous variables for co2.data are:
 * population - Total population
 * gdp - Total real gross domestic product, inflation-adjusted
 
-This data set comes from Our World in Data and will have some limitations, but should be a very trustworthy source as it does come from a source with a good reputation.  You also know that the website doesn't make money off of what they do since it's a .org site
+co2.data comes from Our World in Data and will have some limitations, but should be a very trustworthy source as it does come from a source with a good reputation.  You also know that the website doesn't make money off of what they do since it's a .org site.  The one downside of this data set is that they don't split up co2 emissions to all the possible sources which means the countries actual co2 release could be different.
 
 ```{r}
 tree.data <- read_csv("global_country_tree_cover_loss.csv")
 ```
 
-This data comes from https://www.globalforestwatch.org that is made through a partnership with World Resources Institute. It is updated regularly and keeps track of the forests starting from around 2001.  Since it's hard to keep track of forests before the initial photos in 2001 were taken, the data is a little more limited to recent years
+tree.data comes from https://www.globalforestwatch.org that is made through a partnership with World Resources Institute. It is updated regularly and keeps track of the forests starting from around 2001.  Since it's hard to keep track of forests before the initial photos in 2001 were taken, the data is a little more limited to recent years
 
 The categorical variables for tree.data are:
 
@@ -76,7 +76,58 @@ The continuous variables for tree.data are:
 * All years in between show loss for different years
 * tc_loss_ha_2019 - Hectares tree cover loss for 2019
 
-tree.date looks at all of the tree cover, and to make it a little easier to find patterns in the data, I'm going to cut down the canopy density percentage to 30% and up.  Along with that, im going to rotate the data to make year a new variable so I can easily graph tree loss over the years.
+tree.data is another organization who monitors the forests of our world with satellite data.  Again, they are an .org so the website isn't made to get money and the data they get is going to be quite accurate. Using high resolution satellite imagery to look at our forests is a great way to get a generic summary of how they're doing without too much work. 
+
+One worry for this data set is that comparison between 2001-2009 and 2011-2019 is not supposed to be very accurate or show patterns. The authors of the data said to preform this with caution making me think that they are comparing new data to extent 2000 or extent 2010 to find the loss of tree cover.  If comparing the two, tree growth and forest regrowth will have to be considered.
+
+```{r}
+car.data <- read_csv("Annual_Emissions_per_Vehicle.csv")
+electric.data <- read_csv("Electricity_Sources.csv")
+```
+
+car.data and electric.data is grabbed from https://afdc.energy.gov/vehicles/electric_emissions.html that breaks down the data into a pie chart and bar chart.  This data source is to fill in some blanks of data in our previous data sets so we can better explore our questions
+
+The categorical variables for car.data are:
+
+* car_type - Style of engine for cars
+
+The continuous variables for car.data are:
+
+* pounds_of_c02 - pounds of co2 released by car over a year
+* miles_driven - miles driven by car over a year
+
+The categorical variables for electric.data are:
+
+* electric_sources - Electric source for the grid
+
+The continuous variables for electric.data are:
+
+* percentage_grid - percentage of the grid supported by type of source
+
+These two sets of data are from the United States Department of Energy who also listed where they got their estimations and data.  The sources they used and the results of the summarization all come from quite trustworthy sources.  Though the one downside of this data set is that it is only for the United States and not global.  
+
+# Exploratory Data Analysis
+
+This graph shows the carbon emissions for countries based on the year.
+```{r}
+head(co2.data)
+summary(co2.data)
+```
+You can see an explosive growth in the 1970's with some countries climbing higher than others.
+This data is just a base line to work with for future comparisons and predictions.
+
+```{r}
+ggplot(data = co2.data, mapping = aes(x=year, y=co2))+
+  geom_point(alpha = 0.2)
+  # Something here to add title to plot
+```
+
+```{r}
+head(tree.data)
+summary(tree.data)
+```
+
+tree.date looks at all of the tree cover, and to make it a little easier to find patterns in the data, I'm going to cut down the canopy density percentage to 30% and up.  Along with that, I'm going to rotate the data to make year a new variable so I can easily graph tree loss over the years.
 
 ```{r}
 tree.30threshold <- filter(tree.data, threshold == 30)
@@ -101,59 +152,6 @@ names(tree.30threshold)[24] <- "2018"
 names(tree.30threshold)[25] <- "2019"
 tree.pivot <- pivot_longer(tree.30threshold,c('2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019'),names_to = "years", values_to = "tc_loss_ha")
 head(tree.pivot)
-```
-
-The Last data that I will be using the US department of energy findings with car co2 emissions.  This is going to include the electrical grid and the source of power for electric vehicles.
-```{r}
-car.data <- read_csv("Annual_Emissions_per_Vehicle.csv")
-electric.data <- read_csv("Electricity_Sources.csv")
-```
-This data is grabbed from https://afdc.energy.gov/vehicles/electric_emissions.html that breaks down the data into a pie chart and bar chart.  This data source is to fill in some blanks of data in our previous data sets so we can better explore our questions
-
-# Exploratory Data Analysis
-
-This graph shows the carbon emissions for countries based on the year.
-```{r}
-head(co2.data)
-summary(co2.data)
-```
-You can see an explosive growth in the 1970's with some countries climbing higher than others.
-This data is just a base line to work with for future comparisons and predictions.
-
-```{r}
-ggplot(data = co2.data, mapping = aes(x=year, y=co2))+
-  geom_point(alpha = 0.2)
-  # Something here to add title to plot
-```
-
-```{r}
-summary(tree.data)
-```
-
-tree.date looks at all of the tree cover, and to make it a little easier to find patterns in the data, I'm going to cut down the canopy density percentage to 30% and up.  Along with that, im going to rotate the data to make year a new variable so I can easily graph tree loss over the years.
-
-```{r}
-tree.30threshold <- filter(tree.data, threshold == 30)
-names(tree.30threshold)[7] <- "2001"
-names(tree.30threshold)[8] <- "2002"
-names(tree.30threshold)[9] <- "2003"
-names(tree.30threshold)[10] <- "2004"
-names(tree.30threshold)[11] <- "2005"
-names(tree.30threshold)[12] <- "2006"
-names(tree.30threshold)[13] <- "2007"
-names(tree.30threshold)[14] <- "2008"
-names(tree.30threshold)[15] <- "2009"
-names(tree.30threshold)[16] <- "2010"
-names(tree.30threshold)[17] <- "2011"
-names(tree.30threshold)[18] <- "2012"
-names(tree.30threshold)[19] <- "2013"
-names(tree.30threshold)[20] <- "2014"
-names(tree.30threshold)[21] <- "2015"
-names(tree.30threshold)[22] <- "2016"
-names(tree.30threshold)[23] <- "2017"
-names(tree.30threshold)[24] <- "2018"
-names(tree.30threshold)[25] <- "2019"
-tree.pivot <- pivot_longer(tree.30threshold,c('2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019'),names_to = "years", values_to = "tc_loss_ha")
 summary(tree.pivot)
 ```
 

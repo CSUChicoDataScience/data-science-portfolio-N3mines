@@ -405,14 +405,14 @@ summary {
 ##   population = col_double(),
 ##   gdp = col_double()
 ## )</code></pre>
-<p>This data comes from <a href="https://github.com/owid/co2-data" class="uri">https://github.com/owid/co2-data</a> that is maintained by Our World in Data. It is updated regularly and includes data on CO2 emissions along with other helpful metrics. The original data set has a few more continuous variables that I didn’t think I would need for what I want to look at.</p>
-<p>The categorical variables for this data set are:</p>
+<p>co2.data comes from <a href="https://github.com/owid/co2-data" class="uri">https://github.com/owid/co2-data</a> that is maintained by Our World in Data. It is updated regularly and includes data on CO2 emissions along with other helpful metrics. The original data set has a few more continuous variables that I didn’t think I would need for what I want to look at.</p>
+<p>The categorical variables for co2.data are:</p>
 <ul>
 <li>iso_code - ISO 3166-1 alpha-3 – three-letter country codes</li>
 <li>country - Geographic location</li>
 <li>year - Year of observation</li>
 </ul>
-<p>The continuous variables for this data set are:</p>
+<p>The continuous variables for co2.data are:</p>
 <ul>
 <li>co2 - Annual production-based emissions of carbon dioxide (CO2), measured in million tonnes per year.</li>
 <li>co2_growth_prct - Percentage change in CO2 emissions from one year relative to the previous year.</li>
@@ -428,6 +428,7 @@ summary {
 <li>population - Total population</li>
 <li>gdp - Total real gross domestic product, inflation-adjusted</li>
 </ul>
+<p>co2.data comes from Our World in Data and will have some limitations, but should be a very trustworthy source as it does come from a source with a good reputation. You also know that the website doesn’t make money off of what they do since it’s a .org site. The one downside of this data set is that they don’t split up co2 emissions to all the possible sources which means the countries actual co2 release could be different.</p>
 <pre class="r"><code>tree.data &lt;- read_csv(&quot;global_country_tree_cover_loss.csv&quot;)</code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
@@ -435,7 +436,7 @@ summary {
 ##   country = col_character()
 ## )</code></pre>
 <pre><code>## See spec(...) for full column specifications.</code></pre>
-<p>This data comes from <a href="https://www.globalforestwatch.org" class="uri">https://www.globalforestwatch.org</a> that is made through a partnership with World Resources Institute. It is updated regularly and keeps track of the forests starting from around 2001. Since it’s hard to keep track of forests before the initial photos in 2001 were taken, the data is a little more limited to recent years</p>
+<p>tree.data comes from <a href="https://www.globalforestwatch.org" class="uri">https://www.globalforestwatch.org</a> that is made through a partnership with World Resources Institute. It is updated regularly and keeps track of the forests starting from around 2001. Since it’s hard to keep track of forests before the initial photos in 2001 were taken, the data is a little more limited to recent years</p>
 <p>The categorical variables for tree.data are:</p>
 <ul>
 <li>country - Geographic location</li>
@@ -451,40 +452,8 @@ summary {
 <li>All years in between show loss for different years</li>
 <li>tc_loss_ha_2019 - Hectares tree cover loss for 2019</li>
 </ul>
-<p>This data set looks at all of the tree cover, and to make it a little easier to find patterns in the data, I’m going to cut down the canopy density percentage to 30% and up. Along with that, im going to rotate the data to make year a new variable so I can easily graph tree loss over the years.</p>
-<pre class="r"><code>tree.30threshold &lt;- filter(tree.data, threshold == 30)
-names(tree.30threshold)[7] &lt;- &quot;2001&quot;
-names(tree.30threshold)[8] &lt;- &quot;2002&quot;
-names(tree.30threshold)[9] &lt;- &quot;2003&quot;
-names(tree.30threshold)[10] &lt;- &quot;2004&quot;
-names(tree.30threshold)[11] &lt;- &quot;2005&quot;
-names(tree.30threshold)[12] &lt;- &quot;2006&quot;
-names(tree.30threshold)[13] &lt;- &quot;2007&quot;
-names(tree.30threshold)[14] &lt;- &quot;2008&quot;
-names(tree.30threshold)[15] &lt;- &quot;2009&quot;
-names(tree.30threshold)[16] &lt;- &quot;2010&quot;
-names(tree.30threshold)[17] &lt;- &quot;2011&quot;
-names(tree.30threshold)[18] &lt;- &quot;2012&quot;
-names(tree.30threshold)[19] &lt;- &quot;2013&quot;
-names(tree.30threshold)[20] &lt;- &quot;2014&quot;
-names(tree.30threshold)[21] &lt;- &quot;2015&quot;
-names(tree.30threshold)[22] &lt;- &quot;2016&quot;
-names(tree.30threshold)[23] &lt;- &quot;2017&quot;
-names(tree.30threshold)[24] &lt;- &quot;2018&quot;
-names(tree.30threshold)[25] &lt;- &quot;2019&quot;
-tree.pivot &lt;- pivot_longer(tree.30threshold,c(&#39;2001&#39;,&#39;2002&#39;,&#39;2003&#39;,&#39;2004&#39;,&#39;2005&#39;,&#39;2006&#39;,&#39;2007&#39;,&#39;2008&#39;,&#39;2009&#39;,&#39;2010&#39;,&#39;2011&#39;,&#39;2012&#39;,&#39;2013&#39;,&#39;2014&#39;,&#39;2015&#39;,&#39;2016&#39;,&#39;2017&#39;,&#39;2018&#39;,&#39;2019&#39;),names_to = &quot;years&quot;, values_to = &quot;tc_loss_ha&quot;)
-head(tree.pivot)</code></pre>
-<pre><code>## # A tibble: 6 x 8
-##   country threshold area_ha extent_2000_ha extent_2010_ha `gain_2000-2012~ years
-##   &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt; &lt;chr&gt;
-## 1 Afghan~        30  6.44e7         205791          71797              304 2001 
-## 2 Afghan~        30  6.44e7         205791          71797              304 2002 
-## 3 Afghan~        30  6.44e7         205791          71797              304 2003 
-## 4 Afghan~        30  6.44e7         205791          71797              304 2004 
-## 5 Afghan~        30  6.44e7         205791          71797              304 2005 
-## 6 Afghan~        30  6.44e7         205791          71797              304 2006 
-## # ... with 1 more variable: tc_loss_ha &lt;dbl&gt;</code></pre>
-<p>The Last data that I will be using the US department of energy findings with car co2 emissions. This is going to include the electrical grid and the source of power for electric vehicles.</p>
+<p>tree.data is another organization who monitors the forests of our world with satellite data. Again, they are an .org so the website isn’t made to get money and the data they get is going to be quite accurate. Using high resolution satellite imagery to look at our forests is a great way to get a generic summary of how they’re doing without too much work.</p>
+<p>One worry for this data set is that comparison between 2001-2009 and 2011-2019 is not supposed to be very accurate or show patterns. The authors of the data said to preform this with caution making me think that they are comparing new data to extent 2000 or extent 2010 to find the loss of tree cover. If comparing the two, tree growth and forest regrowth will have to be considered.</p>
 <pre class="r"><code>car.data &lt;- read_csv(&quot;Annual_Emissions_per_Vehicle.csv&quot;)</code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
@@ -498,7 +467,25 @@ head(tree.pivot)</code></pre>
 ##   electric_sources = col_character(),
 ##   percentage_grid = col_double()
 ## )</code></pre>
-<p>This data is grabbed from <a href="https://afdc.energy.gov/vehicles/electric_emissions.html" class="uri">https://afdc.energy.gov/vehicles/electric_emissions.html</a> that breaks down the data into a pie chart and bar chart. This data source is to fill in some blanks of data in our previous data sets so we can better explore our questions</p>
+<p>car.data and electric.data is grabbed from <a href="https://afdc.energy.gov/vehicles/electric_emissions.html" class="uri">https://afdc.energy.gov/vehicles/electric_emissions.html</a> that breaks down the data into a pie chart and bar chart. This data source is to fill in some blanks of data in our previous data sets so we can better explore our questions</p>
+<p>The categorical variables for car.data are:</p>
+<ul>
+<li>car_type - Style of engine for cars</li>
+</ul>
+<p>The continuous variables for car.data are:</p>
+<ul>
+<li>pounds_of_c02 - pounds of co2 released by car over a year</li>
+<li>miles_driven - miles driven by car over a year</li>
+</ul>
+<p>The categorical variables for electric.data are:</p>
+<ul>
+<li>electric_sources - Electric source for the grid</li>
+</ul>
+<p>The continuous variables for electric.data are:</p>
+<ul>
+<li>percentage_grid - percentage of the grid supported by type of source</li>
+</ul>
+<p>These two sets of data are from the United States Department of Energy who also listed where they got their estimations and data. The sources they used and the results of the summarization all come from quite trustworthy sources. Though the one downside of this data set is that it is only for the United States and not global.</p>
 </div>
 <div id="exploratory-data-analysis" class="section level1">
 <h1>Exploratory Data Analysis</h1>
@@ -581,6 +568,104 @@ head(tree.pivot)</code></pre>
 ## #   tc_loss_ha_2012 &lt;dbl&gt;, tc_loss_ha_2013 &lt;dbl&gt;, tc_loss_ha_2014 &lt;dbl&gt;,
 ## #   tc_loss_ha_2015 &lt;dbl&gt;, tc_loss_ha_2016 &lt;dbl&gt;, tc_loss_ha_2017 &lt;dbl&gt;,
 ## #   tc_loss_ha_2018 &lt;dbl&gt;, tc_loss_ha_2019 &lt;dbl&gt;</code></pre>
+<pre class="r"><code>summary(tree.data)</code></pre>
+<pre><code>##    country            threshold        area_ha          extent_2000_ha     
+##  Length:1120        Min.   :10.00   Min.   :3.413e+03   Min.   :        0  
+##  Class :character   1st Qu.:15.00   1st Qu.:5.554e+06   1st Qu.:   532088  
+##  Mode  :character   Median :25.00   Median :2.084e+07   Median :  2958416  
+##                     Mean   :32.14   Mean   :7.815e+07   Mean   : 24476993  
+##                     3rd Qu.:50.00   3rd Qu.:6.204e+07   3rd Qu.: 13985579  
+##                     Max.   :75.00   Max.   :1.678e+09   Max.   :883840852  
+##  extent_2010_ha      gain_2000-2012_ha  tc_loss_ha_2001     tc_loss_ha_2002  
+##  Min.   :        0   Min.   :       0   Min.   :      0.0   Min.   :      0  
+##  1st Qu.:   526713   1st Qu.:    3390   1st Qu.:    604.8   1st Qu.:    536  
+##  Median :  2825550   Median :   32422   Median :   6936.5   Median :   5174  
+##  Mean   : 23942347   Mean   :  502708   Mean   :  80125.7   Mean   :  97936  
+##  3rd Qu.: 14041760   3rd Qu.:  187023   3rd Qu.:  32954.8   3rd Qu.:  33911  
+##  Max.   :870160469   Max.   :16229634   Max.   :2807364.0   Max.   :3571006  
+##  tc_loss_ha_2003   tc_loss_ha_2004   tc_loss_ha_2005   tc_loss_ha_2006    
+##  Min.   :      0   Min.   :      0   Min.   :      0   Min.   :      0.0  
+##  1st Qu.:    420   1st Qu.:    594   1st Qu.:    580   1st Qu.:    533.5  
+##  Median :   4492   Median :   6495   Median :   7206   Median :   7912.5  
+##  Mean   :  85887   Mean   : 118447   Mean   : 108744   Mean   : 106076.4  
+##  3rd Qu.:  31154   3rd Qu.:  41881   3rd Qu.:  40597   3rd Qu.:  42344.0  
+##  Max.   :3323124   Max.   :3926871   Max.   :3539437   Max.   :2934803.0  
+##  tc_loss_ha_2007   tc_loss_ha_2008   tc_loss_ha_2009   tc_loss_ha_2010    
+##  Min.   :      0   Min.   :      0   Min.   :      0   Min.   :      0.0  
+##  1st Qu.:    898   1st Qu.:    780   1st Qu.:    877   1st Qu.:    566.5  
+##  Median :   9396   Median :   9463   Median :  10681   Median :   8046.5  
+##  Mean   : 110328   Mean   : 111325   Mean   : 102375   Mean   : 110957.4  
+##  3rd Qu.:  51438   3rd Qu.:  48102   3rd Qu.:  54086   3rd Qu.:  52596.5  
+##  Max.   :2680946   Max.   :3214291   Max.   :2272509   Max.   :2753204.0  
+##  tc_loss_ha_2011   tc_loss_ha_2012   tc_loss_ha_2013   tc_loss_ha_2014  
+##  Min.   :      0   Min.   :      0   Min.   :      0   Min.   :      0  
+##  1st Qu.:    610   1st Qu.:    830   1st Qu.:    576   1st Qu.:    690  
+##  Median :   8290   Median :  11178   Median :   7652   Median :  11874  
+##  Mean   : 105090   Mean   : 140743   Mean   : 122145   Mean   : 139785  
+##  3rd Qu.:  45392   3rd Qu.:  58321   3rd Qu.:  55440   3rd Qu.:  74240  
+##  Max.   :3261916   Max.   :5899579   Max.   :5456943   Max.   :5054355  
+##  tc_loss_ha_2015     tc_loss_ha_2016   tc_loss_ha_2017   tc_loss_ha_2018  
+##  Min.   :      0.0   Min.   :      0   Min.   :      0   Min.   :      0  
+##  1st Qu.:    404.2   1st Qu.:    922   1st Qu.:    964   1st Qu.:    793  
+##  Median :   7577.0   Median :  15890   Median :  18036   Median :  12669  
+##  Mean   : 115961.6   Mean   : 176624   Mean   : 174889   Mean   : 147212  
+##  3rd Qu.:  54044.8   3rd Qu.: 107996   3rd Qu.: 108026   3rd Qu.:  77345  
+##  Max.   :2840512.0   Max.   :5602202   Max.   :5680139   Max.   :6202876  
+##  tc_loss_ha_2019  
+##  Min.   :      0  
+##  1st Qu.:    654  
+##  Median :  11704  
+##  Mean   : 143760  
+##  3rd Qu.:  77361  
+##  Max.   :4238372</code></pre>
+<p>tree.date looks at all of the tree cover, and to make it a little easier to find patterns in the data, I’m going to cut down the canopy density percentage to 30% and up. Along with that, I’m going to rotate the data to make year a new variable so I can easily graph tree loss over the years.</p>
+<pre class="r"><code>tree.30threshold &lt;- filter(tree.data, threshold == 30)
+names(tree.30threshold)[7] &lt;- &quot;2001&quot;
+names(tree.30threshold)[8] &lt;- &quot;2002&quot;
+names(tree.30threshold)[9] &lt;- &quot;2003&quot;
+names(tree.30threshold)[10] &lt;- &quot;2004&quot;
+names(tree.30threshold)[11] &lt;- &quot;2005&quot;
+names(tree.30threshold)[12] &lt;- &quot;2006&quot;
+names(tree.30threshold)[13] &lt;- &quot;2007&quot;
+names(tree.30threshold)[14] &lt;- &quot;2008&quot;
+names(tree.30threshold)[15] &lt;- &quot;2009&quot;
+names(tree.30threshold)[16] &lt;- &quot;2010&quot;
+names(tree.30threshold)[17] &lt;- &quot;2011&quot;
+names(tree.30threshold)[18] &lt;- &quot;2012&quot;
+names(tree.30threshold)[19] &lt;- &quot;2013&quot;
+names(tree.30threshold)[20] &lt;- &quot;2014&quot;
+names(tree.30threshold)[21] &lt;- &quot;2015&quot;
+names(tree.30threshold)[22] &lt;- &quot;2016&quot;
+names(tree.30threshold)[23] &lt;- &quot;2017&quot;
+names(tree.30threshold)[24] &lt;- &quot;2018&quot;
+names(tree.30threshold)[25] &lt;- &quot;2019&quot;
+tree.pivot &lt;- pivot_longer(tree.30threshold,c(&#39;2001&#39;,&#39;2002&#39;,&#39;2003&#39;,&#39;2004&#39;,&#39;2005&#39;,&#39;2006&#39;,&#39;2007&#39;,&#39;2008&#39;,&#39;2009&#39;,&#39;2010&#39;,&#39;2011&#39;,&#39;2012&#39;,&#39;2013&#39;,&#39;2014&#39;,&#39;2015&#39;,&#39;2016&#39;,&#39;2017&#39;,&#39;2018&#39;,&#39;2019&#39;),names_to = &quot;years&quot;, values_to = &quot;tc_loss_ha&quot;)
+head(tree.pivot)</code></pre>
+<pre><code>## # A tibble: 6 x 8
+##   country threshold area_ha extent_2000_ha extent_2010_ha `gain_2000-2012~ years
+##   &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt; &lt;chr&gt;
+## 1 Afghan~        30  6.44e7         205791          71797              304 2001 
+## 2 Afghan~        30  6.44e7         205791          71797              304 2002 
+## 3 Afghan~        30  6.44e7         205791          71797              304 2003 
+## 4 Afghan~        30  6.44e7         205791          71797              304 2004 
+## 5 Afghan~        30  6.44e7         205791          71797              304 2005 
+## 6 Afghan~        30  6.44e7         205791          71797              304 2006 
+## # ... with 1 more variable: tc_loss_ha &lt;dbl&gt;</code></pre>
+<pre class="r"><code>summary(tree.pivot)</code></pre>
+<pre><code>##    country            threshold     area_ha          extent_2000_ha     
+##  Length:3040        Min.   :30   Min.   :3.413e+03   Min.   :        0  
+##  Class :character   1st Qu.:30   1st Qu.:5.554e+06   1st Qu.:   535590  
+##  Mode  :character   Median :30   Median :2.084e+07   Median :  3232028  
+##                     Mean   :30   Mean   :7.815e+07   Mean   : 24909785  
+##                     3rd Qu.:30   3rd Qu.:6.204e+07   3rd Qu.: 14180518  
+##                     Max.   :30   Max.   :1.678e+09   Max.   :761221223  
+##  extent_2010_ha      gain_2000-2012_ha     years             tc_loss_ha     
+##  Min.   :        0   Min.   :       0   Length:3040        Min.   :      0  
+##  1st Qu.:   547041   1st Qu.:    3390   Class :character   1st Qu.:    641  
+##  Median :  3280629   Median :   32422   Mode  :character   Median :   9430  
+##  Mean   : 24462305   Mean   :  502708                      Mean   : 126616  
+##  3rd Qu.: 13964395   3rd Qu.:  187023                      3rd Qu.:  57491  
+##  Max.   :754741522   Max.   :16229634                      Max.   :5560425</code></pre>
 <pre class="r"><code>head(car.data)</code></pre>
 <pre><code>## # A tibble: 4 x 3
 ##   car_type       pounds_of_c02 miles_driven
