@@ -200,6 +200,14 @@ Though you can see each line with their growth over the years, some moving faste
 than others.
 
 ```{r}
+summary(co2.data)
+```
+
+You can also see from this summary of co2.data that the mean of co2_growth_prct
+is on an upward trend even though the min occurrence is negative. Same thing with the
+co2_growth_abs.
+
+```{r}
 ggplot()+
   geom_smooth(data = filter(co2.data, country == "World"), se = FALSE, mapping = aes(x=year, y=cement_co2, color='cement'))+
   geom_smooth(data = filter(co2.data, country == "World"), se = FALSE, mapping = aes(x=year, y=coal_co2, color='coal'))+
@@ -252,6 +260,19 @@ names(tree.30threshold)[25] <- "2019"
 tree.pivot <- pivot_longer(tree.30threshold,c('2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019'),names_to = "year", values_to = "tc_loss_ha")
 head(tree.pivot)
 ```
+
+Using the same method I did with co2 emissions for each country, you can see the
+deforestation for multiple countries here.  I chose the highest ones since I have
+too many countries to graph them all.  I would have done geom_smooth but the 
+unpredictable data made it so geom smooth didn't work, this might be an issue in
+the future.
+```{r}
+summarize(tree.pivot, mean(tc_loss_ha))
+```
+Though I couldn't make a graph you can see the mean tc_loss_ha over all the years.
+I'm going to have to the size of this data and look at singular countries or make
+the data easier to look at some point.  Maybe I could come up with a sum total to
+look at the world deforestation?
 
 Using this pivot, we can combine with the co2 data with the years and countries 
 that appear in both data sets.  This gives us a generic and overarching data set 
