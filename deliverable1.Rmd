@@ -14,7 +14,15 @@ options(warn=-1)
 
 # Introduction
 
-In this project I will be studying climate change, deforestation, fires, and more with their effects on carbon emissions on earth.  Using these predictions or data I will try to look to the future as well as find other correlations between the climate and how we live.  The reason I'm interested in this field of research is because of the fires and reduction of snow in California along with the fear of how our actions might effect future generations.  My parents have talked about how much snow there used to be in Tahoe, and how the fires have just gotten bigger.  I want to know what we can change, and what causes the climate to warm and change over time
+In this project I will be studying climate change, deforestation, fires, and more
+with their effects on carbon emissions on earth.  Using these predictions or data
+I will try to look to the future as well as find other correlations between the 
+climate and how we live.  The reason I'm interested in this field of research is 
+because of the fires and reduction of snow in California along with the fear of 
+how our actions might effect future generations.  My parents have talked about how
+much snow there used to be in Tahoe, and how the fires have just gotten bigger.  
+I want to know what we can change, and what causes the climate to warm and change
+over time
 
 The Domains I will specifically be looking into are:
 
@@ -30,7 +38,10 @@ The Domains I will specifically be looking into are:
 ```{r}
 co2.data <- read_csv("owid-co2-data.xlsx.csv")
 ```
-co2.data comes from https://github.com/owid/co2-data that is maintained by Our World in Data. It is updated regularly and includes data on CO2 emissions along with other helpful metrics.  The original data set has a few more continuous variables that I didn't think I would need for what I want to look at.
+co2.data comes from https://github.com/owid/co2-data that is maintained by Our 
+World in Data. It is updated regularly and includes data on CO2 emissions along 
+with other helpful metrics.  The original data set has a few more continuous 
+variables that I didn't think I would need for what I want to look at.
 
 The categorical variables for co2.data are:
 
@@ -54,13 +65,22 @@ The continuous variables for co2.data are:
 * population - Total population
 * gdp - Total real gross domestic product, inflation-adjusted
 
-co2.data comes from Our World in Data and will have some limitations, but should be a very trustworthy source as it does come from a source with a good reputation.  You also know that the website doesn't make money off of what they do since it's a .org site.  The one downside of this data set is that they don't split up co2 emissions to all the possible sources which means the countries actual co2 release could be different.
+co2.data comes from Our World in Data and will have some limitations, but should
+be a very trustworthy source as it does come from a source with a good reputation.
+You also know that the website doesn't make money off of what they do since it's 
+a .org site.  The one downside of this data set is that they don't split up co2 
+emissions to all the possible sources which means the countries actual co2 release
+could be different.
 
 ```{r}
 tree.data <- read_csv("global_country_tree_cover_loss.csv")
 ```
 
-tree.data comes from https://www.globalforestwatch.org that is made through a partnership with World Resources Institute. It is updated regularly and keeps track of the forests starting from around 2001.  Since it's hard to keep track of forests before the initial photos in 2001 were taken, the data is a little more limited to recent years.
+tree.data comes from https://www.globalforestwatch.org that is made through a 
+partnership with World Resources Institute. It is updated regularly and keeps 
+track of the forests starting from around 2001.  Since it's hard to keep track 
+of forests before the initial photos in 2001 were taken, the data is a little 
+more limited to recent years.
 
 The categorical variables for tree.data are:
 
@@ -77,15 +97,26 @@ The continuous variables for tree.data are:
 * All years in between show loss for different years
 * tc_loss_ha_2019 - Hectares tree cover loss for 2019
 
-tree.data is another organization who monitors the forests of our world with satellite data.  Again, they are an .org so the website isn't made to get money and the data they get is going to be quite accurate. Using high resolution satellite imagery to look at our forests is a great way to get a generic summary of how they're doing without too much work. 
+tree.data is another organization who monitors the forests of our world with 
+satellite data.  Again, they are an .org so the website isn't made to get money 
+and the data they get is going to be quite accurate. Using high resolution 
+satellite imagery to look at our forests is a great way to get a generic summary 
+of how they're doing without too much work. 
 
-One worry for this data set is that comparison between 2001-2009 and 2011-2019 is not supposed to be very accurate or show patterns. The authors of the data said to preform this with caution making me think that they are comparing new data to extent 2000 or extent 2010 to find the loss of tree cover.  If comparing the two, tree growth and forest regrowth will have to be considered.
+One worry for this data set is that comparison between 2001-2009 and 2011-2019 is 
+not supposed to be very accurate or show patterns. The authors of the data said to 
+preform this with caution making me think that they are comparing new data to extent
+2000 or extent 2010 to find the loss of tree cover.  If comparing the two, tree 
+growth and forest regrowth will have to be considered.
 
 ```{r}
 fire.data <- read_csv("US_Fires.csv")
 ```
 
-fire.data comes from https://www.nifc.gov/fireInfo/fireInfo_stats_totalFires.html.  The data for this data set comes from the National Interagency Fire Center who handles multi agency corrdination for fire fighting in the United States.  The data that it provides is a general summary of the US and the fires over years.
+fire.data comes from https://www.nifc.gov/fireInfo/fireInfo_stats_totalFires.html.
+The data for this data set comes from the National Interagency Fire Center who 
+handles multi agency corrdination for fire fighting in the United States.  The data
+that it provides is a general summary of the US and the fires over years.
 
 The categorical variables for fire.data are:
 
@@ -96,16 +127,23 @@ The continuous variables for fire.data are:
 * Fires - Number of fires
 * Acres - Acres burned
 
-fire.data does come from a .org and national agency, but I dont know how reliable it is going to be.  I have never heard of this group until I was looking for data so I might run into issues later if I realize this data isn't reliable.
+fire.data does come from a .org and national agency, but I dont know how reliable
+it is going to be.  I have never heard of this group until I was looking for data
+so I might run into issues later if I realize this data isn't reliable.
 
-Another worry with this data is there is a chance deforestation is the US and the acres burned are connected, but also who knows, more research is going to be needed to figure out if they track the similar areas.
+Another worry with this data is there is a chance deforestation is the US and 
+the acres burned are connected, but also who knows, more research is going to be
+needed to figure out if they track the similar areas.
 
 ```{r}
 car.data <- read_csv("Annual_Emissions_per_Vehicle.csv")
 electric.data <- read_csv("Electricity_Sources.csv")
 ```
 
-car.data and electric.data is grabbed from https://afdc.energy.gov/vehicles/electric_emissions.html that breaks down the data into a pie chart and bar chart.  This data source is to fill in some blanks of data in our previous data sets so we can better explore our questions
+car.data and electric.data is grabbed from 
+https://afdc.energy.gov/vehicles/electric_emissions.html that breaks down the 
+data into a pie chart and bar chart.  This data source is to fill in some blanks 
+of data in our previous data sets so we can better explore our questions
 
 The categorical variables for car.data are:
 
@@ -124,16 +162,26 @@ The continuous variables for electric.data are:
 
 * percentage_grid - percentage of the grid supported by type of source
 
-These two sets of data are from the United States Department of Energy who also listed where they got their estimations and data.  The sources they used and the results of the summarization all come from quite trustworthy sources.  Though the one downside of this data set is that it is only for the United States and not global.  
+These two sets of data are from the United States Department of Energy who also 
+listed where they got their estimations and data.  The sources they used and the 
+results of the summarization all come from quite trustworthy sources.  Though the 
+one downside of this data set is that it is only for the United States and not global.  
 
 # Data Prep and Analysis
 
-co2.data has data that covers generic land regions that overlap with countries.  This is just added up from each country in it so I figured by deleting the data that didn't have an iso_code, we could remove some of this overlap.  I'm also going to delete any data that doesnt have co2 output since thats what we really care about when looking at this data
+co2.data has data that covers generic land regions that overlap with countries.  
+This is just added up from each country in it so I figured by deleting the data 
+that didn't have an iso_code, we could remove some of this overlap.  I'm also 
+going to delete any data that doesn't have co2 output since that's what we really \
+are about when looking at this data
 ```{r}
 co2.data <- filter(co2.data, iso_code != is.na(iso_code), co2 > 0)
 head(co2.data)
 ```
-This graph shows the carbon emissions for countries based on the year, though the first time I tried this, it didn't work since there were too many countries with very low carbon output to draw lines for each one.  For ease of visualization, I'm going to set the co2 to above 100 million tonnes per year.
+This graph shows the carbon emissions for countries based on the year, though the
+first time I tried this, it didn't work since there were too many countries with 
+very low carbon output to draw lines for each one.  For ease of visualization, I'm 
+going to set the co2 to above 100 million tonnes per year.
 ```{r}
 ggplot(data = filter(co2.data, co2 > 100, country != "World"), mapping = aes(x=year, y=co2, color = country))+
   geom_smooth(alpha = 0.2)+
@@ -143,7 +191,13 @@ ggplot(data = filter(co2.data, country == "World"), mapping = aes(x=year, y=co2,
   ggtitle("World co2 output")
 ```
 
-You can see from this data set, the overall growth of co2 emissions and outputs with the World summary line.  Admittedly there are too many countries to see all of this added up on the graph, but you can see the general idea with the visible lines.  There are also lots more in the data set that are not put in the graph since we wouldn't be able to graph each line, these are just the biggest emitters.  Though you can see each line with their growth over the years, some moveing faster than others.
+You can see from this data set, the overall growth of co2 emissions and outputs 
+with the World summary line.  Admittedly there are too many countries to see all 
+of this added up on the graph, but you can see the general idea with the visible 
+lines.  There are also lots more in the data set that are not put in the graph 
+since we wouldn't be able to graph each line, these are just the biggest emitters.
+Though you can see each line with their growth over the years, some moveing faster
+than others.
 
 ```{r}
 ggplot()+
@@ -155,13 +209,22 @@ ggplot()+
   ggtitle("World coal co2 output")
 ```
 
-This graph splits up all the sources of co2 in the world to really show who is doing the most and what really needs to be fixed if we want to reduce our emissions.  These could all be things fixed in the future to reverse the damage we have done so far.
+This graph splits up all the sources of co2 in the world to really show who is 
+doing the most and what really needs to be fixed if we want to reduce our emissions.
+These could all be things fixed in the future to reverse the damage we have done 
+so far.
 
 ```{r}
 head(tree.data)
 ```
 
-tree.date looks at all of the tree cover, and to make it a little easier to find patterns in the data, I'm going to cut down the canopy density percentage to 30% and up.  The reason for cutting at 30% is that its the better visualization of tree loss, you can't choose 100%, but you cant choose 10%, as acres lost at that point would do very little to the number of trees.  Along with that, I'm going to rotate the data to make year a new variable so I can easily graph tree loss over the years as well as join co2 and trees later on.
+tree.date looks at all of the tree cover, and to make it a little easier to find 
+patterns in the data, I'm going to cut down the canopy density percentage to 30% 
+and up.  The reason for cutting at 30% is that its the better visualization of tree 
+loss, you can't choose 100%, but you cant choose 10%, as acres lost at that point 
+would do very little to the number of trees.  Along with that, I'm going to rotate 
+the data to make year a new variable so I can easily graph tree loss over the years 
+as well as join co2 and trees later on.
 
 ```{r}
 tree.30threshold <- filter(tree.data, threshold == 30)
@@ -188,7 +251,11 @@ tree.pivot <- pivot_longer(tree.30threshold,c('2001','2002','2003','2004','2005'
 head(tree.pivot)
 ```
 
-Using this pivot, we can combine with the co2 data with the years and countries that appear in both data sets.  This gives us a generic and overarching data set with deforestation rates and co2 emissions.  I'm going to filter as well since if I don't want to join and have tree data being empty, I want the related years only, which is limited my tree.pivot which goes 2001-2019.
+Using this pivot, we can combine with the co2 data with the years and countries 
+that appear in both data sets.  This gives us a generic and overarching data set 
+with deforestation rates and co2 emissions.  I'm going to filter as well since if 
+I don't want to join and have tree data being empty, I want the related years only, 
+which is limited my tree.pivot which goes 2001-2019.
 
 ```{r}
 tree.pivot$year <- as.double(tree.pivot$year)
@@ -198,7 +265,9 @@ head(tree.co2.data)
 ```
 
 
-To take a peek for relations in the tree/co2 data set, I'm going to reduce it to just the USA where I can look at both the growth rates of deforestation and how much co2 we make
+To take a peek for relations in the tree/co2 data set, I'm going to reduce it to 
+just the USA where I can look at both the growth rates of deforestation and how 
+much co2 we make
 
 ```{r}
 ggplot(data = filter(tree.co2.data, iso_code == 'USA'), mapping = aes(x=year, y=co2, color = country))+
@@ -212,7 +281,10 @@ ggplot(data = filter(tree.co2.data, iso_code == 'USA'), mapping = aes(x=year, y=
   ggtitle("GDP over the years")
 ```
 
-while it does look like deforestation and co2 output seem to have very similar curves on this graph pair at first, it could be explored more to see if this is true with other countries as well.  If this is true then I would have to look into the idea of co2 output and hectares lost being connected on the co2 charts.
+while it does look like deforestation and co2 output seem to have very similar 
+curves on this graph pair at first, it could be explored more to see if this is 
+true with other countries as well.  If this is true then I would have to look into 
+the idea of co2 output and hectares lost being connected on the co2 charts.
 
 
 
@@ -221,7 +293,10 @@ head(fire.data)
 summary(fire.data)
 ```
 
-The Fire data for the US is mainly to see if there is a connection with the co2 emissions and rates of fire as well.  There is a chance that deforestation reduces fires as well which could be something explored in the future as well.  This could be explored further if I look into the Australian data with their recent mega fire.
+The Fire data for the US is mainly to see if there is a connection with the co2 
+emissions and rates of fire as well.  There is a chance that deforestation reduces 
+fires as well which could be something explored in the future as well.  This could 
+be explored further if I look into the Australian data with their recent mega fire.
 
 ```{r}
 ggplot()+
@@ -232,22 +307,41 @@ ggplot()+
   ggtitle("US Acres Burned")
 ```
 
-Though this data is only the United States, it is interesting seeing the dip end in 1975, and slowly go back up while the number of fires still goes down, it seems like the fires are just getting bigger in more recent years, but we have less fires starting overall.
+Though this data is only the United States, it is interesting seeing the dip end 
+in 1975, and slowly go back up while the number of fires still goes down, it seems 
+like the fires are just getting bigger in more recent years, but we have less fires 
+starting overall.
 
 ```{r}
 head(car.data)
 head(electric.data)
 ```
 
-These last two data sets are just to fill in later when we look at renewable energy and what would happen if we managed to switch to a green house gas free life style which would include changing the power grid and switching to electric cars.  This data set needs to be worked on with more tables if I pursue this path further.
+These last two data sets are just to fill in later when we look at renewable 
+energy and what would happen if we managed to switch to a green house gas free 
+life style which would include changing the power grid and switching to electric 
+cars.  This data set needs to be worked on with more tables if I pursue this path 
+further.
 
 # Data Science Questions
 
-Looking at this initial data relating to each other with the whole world its co2 data, to just looking at the US to find a closer relation, it seems like deforestation might be promising to explore to see if that is more closely related to emissions.
+Looking at this initial data relating to each other with the whole world its co2 
+data, to just looking at the US to find a closer relation, it seems like 
+deforestation might be promising to explore to see if that is more closely related 
+to emissions.
 
-I also want to look into GPD and co2 output as well, i think that they don't have to be connected, but could also be in close relation when your economy is based off of machinery that isn't the cleanest.  For example a country that has a higher oil co2 release might have a higher GPD and be having more deforestation as well.  This would all point to a mindset though rather than an actual mathematical pattern that you can follow.
+I also want to look into GPD and co2 output as well, i think that they don't have 
+to be connected, but could also be in close relation when your economy is based 
+off of machinery that isn't the cleanest.  For example a country that has a higher 
+oil co2 release might have a higher GPD and be having more deforestation as well.
+This would all point to a mindset though rather than an actual mathematical pattern 
+that you can follow.
 
-I don't think there are any ethical or social disadvantages to looking into this area and digging deeper into relations between the forests of our world and climate change.  If anything, this research will end up pointing fingers and showing the countries that really need to get their act together and push society further along to improve itself.
+I don't think there are any ethical or social disadvantages to looking into this
+area and digging deeper into relations between the forests of our world and climate 
+change.  If anything, this research will end up pointing fingers and showing the 
+countries that really need to get their act together and push society further along 
+to improve itself.
 
 
 
