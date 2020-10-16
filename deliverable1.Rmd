@@ -14,7 +14,7 @@ options(warn=-1)
 
 # Introduction
 
-In this project I will be studying fires, electronic, climate change, and more with their effects on carbon emissions on earth.  Using these predictions or data I will try to look to the future as well as find other correlations between the climate and how we live.  The reason I'm interested in this field of research is because of the fires and reduction of snow in California.  My parents have talked about how much snow there used to be in Tahoe, and how the fires have just gotten bigger.  I want to know what we can change, and what causes the climate to warm and change over time
+In this project I will be studying climate change, deforestation, fires, and more with their effects on carbon emissions on earth.  Using these predictions or data I will try to look to the future as well as find other correlations between the climate and how we live.  The reason I'm interested in this field of research is because of the fires and reduction of snow in California along with the fear of how our actions might effect future generations.  My parents have talked about how much snow there used to be in Tahoe, and how the fires have just gotten bigger.  I want to know what we can change, and what causes the climate to warm and change over time
 
 The Domains I will specifically be looking into are:
 
@@ -142,7 +142,8 @@ ggplot(data = filter(co2.data, country == "World"), mapping = aes(x=year, y=co2,
   geom_smooth(alpha = 0.2)+
   ggtitle("World co2 output")
 ```
-You can see from this data set, the overall growth of co2 emissions and outputs with the World summary line.  Admittedly there are too many countries to see all of this added up on the graph, but you can see the general idea with the visible lines.  There are also lots more in the data set that are not put in the graph since we wouldn't be able to graph each line, these are just the biggest emitters.
+
+You can see from this data set, the overall growth of co2 emissions and outputs with the World summary line.  Admittedly there are too many countries to see all of this added up on the graph, but you can see the general idea with the visible lines.  There are also lots more in the data set that are not put in the graph since we wouldn't be able to graph each line, these are just the biggest emitters.  Though you can see each line with their growth over the years, some moveing faster than others.
 
 ```{r}
 ggplot()+
@@ -160,7 +161,7 @@ This graph splits up all the sources of co2 in the world to really show who is d
 head(tree.data)
 ```
 
-tree.date looks at all of the tree cover, and to make it a little easier to find patterns in the data, I'm going to cut down the canopy density percentage to 30% and up.  Along with that, I'm going to rotate the data to make year a new variable so I can easily graph tree loss over the years as well as join co2 and trees later on.
+tree.date looks at all of the tree cover, and to make it a little easier to find patterns in the data, I'm going to cut down the canopy density percentage to 30% and up.  The reason for cutting at 30% is that its the better visualization of tree loss, you can't choose 100%, but you cant choose 10%, as acres lost at that point would do very little to the number of trees.  Along with that, I'm going to rotate the data to make year a new variable so I can easily graph tree loss over the years as well as join co2 and trees later on.
 
 ```{r}
 tree.30threshold <- filter(tree.data, threshold == 30)
@@ -187,7 +188,8 @@ tree.pivot <- pivot_longer(tree.30threshold,c('2001','2002','2003','2004','2005'
 head(tree.pivot)
 ```
 
-Using this pivot, we can combine with the co2 data with the years and countries that appear in both data sets.  This gives us a generic and overarching data set with deforestation rates and co2 emissions of countries from 2001-2019.
+Using this pivot, we can combine with the co2 data with the years and countries that appear in both data sets.  This gives us a generic and overarching data set with deforestation rates and co2 emissions.  I'm going to filter as well since if I don't want to join and have tree data being empty, I want the related years only, which is limited my tree.pivot which goes 2001-2019.
+
 ```{r}
 tree.pivot$year <- as.double(tree.pivot$year)
 tree.co2.data <- left_join(co2.data, tree.pivot) %>%
@@ -196,7 +198,7 @@ head(tree.co2.data)
 ```
 
 
-To look for relations in the tree/co2 data set, I'm going to reduce it to just the USA where I can look at both the growth rates of deforestation and how much co2 we make
+To take a peek for relations in the tree/co2 data set, I'm going to reduce it to just the USA where I can look at both the growth rates of deforestation and how much co2 we make
 
 ```{r}
 ggplot(data = filter(tree.co2.data, iso_code == 'USA'), mapping = aes(x=year, y=co2, color = country))+
@@ -219,7 +221,7 @@ head(fire.data)
 summary(fire.data)
 ```
 
-The Fire data for the US is mainly to see if there is a connection with the co2 emissions and rates of fire as well.  There is a chance that deforestation reduces fires as well which could be something explored in the future as well.  This could be explored futher if I look into the Australian data with their recent mega fire.
+The Fire data for the US is mainly to see if there is a connection with the co2 emissions and rates of fire as well.  There is a chance that deforestation reduces fires as well which could be something explored in the future as well.  This could be explored further if I look into the Australian data with their recent mega fire.
 
 ```{r}
 ggplot()+
@@ -236,11 +238,12 @@ Though this data is only the United States, it is interesting seeing the dip end
 head(car.data)
 head(electric.data)
 ```
+
 These last two data sets are just to fill in later when we look at renewable energy and what would happen if we managed to switch to a green house gas free life style which would include changing the power grid and switching to electric cars.  This data set needs to be worked on with more tables if I pursue this path further.
 
 # Data Science Questions
 
-Looking at this initial data relating to each other with the whole world its co2 data, to just looking at the US to find a closer relation, it seems like deforestation might be promising to explore to see if that is more closley related to emissions.
+Looking at this initial data relating to each other with the whole world its co2 data, to just looking at the US to find a closer relation, it seems like deforestation might be promising to explore to see if that is more closely related to emissions.
 
 I also want to look into GPD and co2 output as well, i think that they don't have to be connected, but could also be in close relation when your economy is based off of machinery that isn't the cleanest.  For example a country that has a higher oil co2 release might have a higher GPD and be having more deforestation as well.  This would all point to a mindset though rather than an actual mathematical pattern that you can follow.
 
