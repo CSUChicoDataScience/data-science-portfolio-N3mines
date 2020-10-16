@@ -196,7 +196,7 @@ with the World summary line.  Admittedly there are too many countries to see all
 of this added up on the graph, but you can see the general idea with the visible 
 lines.  There are also lots more in the data set that are not put in the graph 
 since we wouldn't be able to graph each line, these are just the biggest emitters.
-Though you can see each line with their growth over the years, some moveing faster
+Though you can see each line with their growth over the years, some moving faster
 than others.
 
 ```{r}
@@ -217,6 +217,8 @@ so far.
 ```{r}
 head(tree.data)
 ```
+
+
 
 tree.date looks at all of the tree cover, and to make it a little easier to find 
 patterns in the data, I'm going to cut down the canopy density percentage to 30% 
