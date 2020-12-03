@@ -1,0 +1,94 @@
+---
+title: "Deliverable 2"
+author: "Carlson Smith"
+date: "10/15/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+options(warn=-1)
+```
+
+# Data from part 1
+
+```{r}
+co2.data <- read_csv("owid-co2-data.xlsx.csv")
+tree.data <- read_csv("global_country_tree_cover_loss.csv")
+fire.data <- read_csv("US_Fires.csv")
+car.data <- read_csv("Annual_Emissions_per_Vehicle.csv")
+electric.data <- read_csv("Electricity_Sources.csv")
+co2.data <- filter(co2.data, iso_code != is.na(iso_code), co2 > 0)
+tree.30threshold <- filter(tree.data, threshold == 30)
+names(tree.30threshold)[7] <- "2001"
+names(tree.30threshold)[8] <- "2002"
+names(tree.30threshold)[9] <- "2003"
+names(tree.30threshold)[10] <- "2004"
+names(tree.30threshold)[11] <- "2005"
+names(tree.30threshold)[12] <- "2006"
+names(tree.30threshold)[13] <- "2007"
+names(tree.30threshold)[14] <- "2008"
+names(tree.30threshold)[15] <- "2009"
+names(tree.30threshold)[16] <- "2010"
+names(tree.30threshold)[17] <- "2011"
+names(tree.30threshold)[18] <- "2012"
+names(tree.30threshold)[19] <- "2013"
+names(tree.30threshold)[20] <- "2014"
+names(tree.30threshold)[21] <- "2015"
+names(tree.30threshold)[22] <- "2016"
+names(tree.30threshold)[23] <- "2017"
+names(tree.30threshold)[24] <- "2018"
+names(tree.30threshold)[25] <- "2019"
+tree.pivot <- pivot_longer(tree.30threshold,c('2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019'),names_to = "year", values_to = "tc_loss_ha")
+head(tree.pivot)
+tree.pivot$year <- as.double(tree.pivot$year)
+tree.co2.data <- left_join(co2.data, tree.pivot) %>%
+  filter(year > 2000)
+```
+Need to look for data of electric car sales in each country, could have relation
+to co2 output depending on the power grid of a country.  If so I can 
+
+
+# Data Science Questions
+
+Looking at this initial data relating to each other with the whole world its co2 
+data, to just looking at the US to find a closer relation, it seems like 
+deforestation might be promising to explore to see if that is more closely related 
+to emissions.
+
+I also want to look into GPD and co2 output as well, i think that they don't have 
+to be connected, but could also be in close relation when your economy is based 
+off of machinery that isn't the cleanest.  For example a country that has a higher 
+oil co2 release might have a higher GPD and be having more deforestation as well.
+This would all point to a mindset though rather than an actual mathematical pattern 
+that you can follow.
+
+I don't think there are any ethical or social disadvantages to looking into this
+area and digging deeper into relations between the forests of our world and climate 
+change.  If anything, this research will end up pointing fingers and showing the 
+countries that really need to get their act together and push society further along 
+to improve itself.
+
+# Possible Model Topics.
+
+``` {r}
+ggplot(data = filter(co2.data, country == "World"), mapping = aes(x=year, y=co2, color = country))+
+  geom_smooth(alpha = 0.2)+
+  ggtitle("World co2 output")
+ggplot(data = filter(co2.data, country == "World"), mapping = aes(x=year, y=gdp, color = country))+
+  geom_smooth(alpha = 0.2)+
+  ggtitle("World overall GPD")
+```
+From the data science questions I wanted to look into from the initial data analysis, it seems like gdp and co2 might have a very close relation based on the general look of the world.  THough I do want to look into specific countries since I know the USA has curbed their co2 outputs but their gdp is still rising.  
+
+THe model would be a simple relation between gdp and the co2 outputs
+```{r}
+ggplot(data = filter(co2.data, country == "United States"), mapping = aes(x=co2, y=gdp))+
+  geom_point(alpha = 0.2)+
+  ggtitle("GDP vs Co2")
+```
+While its quite hard to see much in this point graph, looking into individual co2 emissions might provide better results.
