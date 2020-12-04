@@ -11,46 +11,22 @@ output:
 library(readr)
 library(tidyverse)
 library(ggplot2)
+library(modelr)
+library(caret)
+library(splines)
 options(warn=-1)
 ```
 
-# Data from part 1
+# Data from part 1 to be used in part 2
 
 ```{r}
 co2.data <- read_csv("owid-co2-data.xlsx.csv")
-tree.data <- read_csv("global_country_tree_cover_loss.csv")
-fire.data <- read_csv("US_Fires.csv")
-car.data <- read_csv("Annual_Emissions_per_Vehicle.csv")
-electric.data <- read_csv("Electricity_Sources.csv")
 co2.data <- filter(co2.data, iso_code != is.na(iso_code), co2 > 0)
-tree.30threshold <- filter(tree.data, threshold == 30)
-names(tree.30threshold)[7] <- "2001"
-names(tree.30threshold)[8] <- "2002"
-names(tree.30threshold)[9] <- "2003"
-names(tree.30threshold)[10] <- "2004"
-names(tree.30threshold)[11] <- "2005"
-names(tree.30threshold)[12] <- "2006"
-names(tree.30threshold)[13] <- "2007"
-names(tree.30threshold)[14] <- "2008"
-names(tree.30threshold)[15] <- "2009"
-names(tree.30threshold)[16] <- "2010"
-names(tree.30threshold)[17] <- "2011"
-names(tree.30threshold)[18] <- "2012"
-names(tree.30threshold)[19] <- "2013"
-names(tree.30threshold)[20] <- "2014"
-names(tree.30threshold)[21] <- "2015"
-names(tree.30threshold)[22] <- "2016"
-names(tree.30threshold)[23] <- "2017"
-names(tree.30threshold)[24] <- "2018"
-names(tree.30threshold)[25] <- "2019"
-tree.pivot <- pivot_longer(tree.30threshold,c('2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019'),names_to = "year", values_to = "tc_loss_ha")
-head(tree.pivot)
-tree.pivot$year <- as.double(tree.pivot$year)
-tree.co2.data <- left_join(co2.data, tree.pivot) %>%
-  filter(year > 2000)
 ```
-Need to look for data of electric car sales in each country, could have relation
-to co2 output depending on the power grid of a country.  If so I can 
+Need to look for data of electric energy use on the power grid to see if that 
+might have a relation to any of the co2 growth charts in a country.  Electric 
+cars might also have an impact since they get gas cars off the roads, but data 
+for that topic is quite hard to find.
 
 
 # Data Science Questions
@@ -66,6 +42,11 @@ off of machinery that isn't the cleanest.  For example a country that has a high
 oil co2 release might have a higher GPD and be having more deforestation as well.
 This would all point to a mindset though rather than an actual mathematical pattern 
 that you can follow.
+
+Power grids in a country might also have an affect on this area as some countries 
+make their way towards a 0 carbon life style.  This might now actually push much
+around though as construction and vehicles are also another big factor in this
+area.
 
 I don't think there are any ethical or social disadvantages to looking into this
 area and digging deeper into relations between the forests of our world and climate 
@@ -83,12 +64,180 @@ ggplot(data = filter(co2.data, country == "World"), mapping = aes(x=year, y=gdp,
   geom_smooth(alpha = 0.2)+
   ggtitle("World overall GPD")
 ```
-From the data science questions I wanted to look into from the initial data analysis, it seems like gdp and co2 might have a very close relation based on the general look of the world.  THough I do want to look into specific countries since I know the USA has curbed their co2 outputs but their gdp is still rising.  
+From the data science questions I wanted to look into from the initial data 
+analysis, it seems like gdp and co2 might have a very close relation based on 
+the general look of the world.  THough I do want to look into specific countries 
+since I know the USA has curbed their co2 outputs but their gdp is still rising.  
 
 THe model would be a simple relation between gdp and the co2 outputs
 ```{r}
 ggplot(data = filter(co2.data, country == "United States"), mapping = aes(x=co2, y=gdp))+
   geom_point(alpha = 0.2)+
+  geom_smooth(alpha = 0)+
   ggtitle("GDP vs Co2")
 ```
-While its quite hard to see much in this point graph, looking into individual co2 emissions might provide better results.
+While its quite hard to see much in this point graph, looking into individual 
+co2 emissions might provide better results.
+
+To make a model off of gdp to attempt finding a prediction on co2 output, I'm 
+first going to split the data into an 80% 20% split for training and testing.  
+
+Setting a seed is also going to help streamline the process in this case it makes
+sure the random data split is the same each time.  In the data split though, I 
+need to get rid of NA values that I will be making the model off of.
+
+```{r}
+set.seed(12345)
+co2.data <- filter(co2.data, gdp != is.na(gdp), co2 != is.na(co2))
+train_rows <- as.vector(createDataPartition(co2.data$co2, p = 0.8, list = FALSE))
+tv_data <- co2.data[train_rows, ]
+test <- co2.data[-train_rows, ]
+```
+
+Since I only have two data sets with no validation split, I will be using the 
+k-fold cross validation method to make a linear model on the training set.
+
+```{r}
+train.control <- trainControl(method = "cv", number = 5)
+model <- train(co2 ~ gdp, data = tv_data, method = "lm", trControl = train.control)
+
+predictions <- add_predictions(test, model)
+R2(predictions$pred, predictions$co2)
+MAE(predictions$pred, predictions$co2)
+RMSE(predictions$pred, predictions$co2)
+```
+```{r}
+ggplot(data = predictions, mapping=(aes(x = co2, y = pred)))+
+  geom_point(alpha = 0.5)+
+  geom_abline(intercept = 0, slope = 1, color = "red")+
+  ggtitle("Perfect Prediction Outline Graph")
+```
+
+Looking at these data pieces it looks like our linear model found some pattern it
+could make into an eq as the R2 value isn't too far from 1.  But looking at the 
+prediction graph, it seems like a linear model might not be able to capture the 
+exact values.
+
+```{r}
+resid <- add_residuals(test, model)
+ggplot(data = resid, mapping = aes(x=gdp, y=resid))+
+  geom_point(alpha = 0.2)+
+  geom_ref_line(h=0)+
+  ggtitle("Residual Data Graph")
+resid <- add_residuals(test, model)
+ggplot(data = resid, mapping = aes(x=gdp, y=resid))+
+  geom_point(alpha = 0.2)+
+  geom_ref_line(h=0)+
+  xlim(0,62500000000)+
+  ylim(-100,100)+
+  ggtitle("Residual Data Graph")
+ggplot(data = resid, mapping = aes(x=gdp, y=resid))+
+  geom_point(alpha = 0.2)+
+  geom_ref_line(h=0)+
+  xlim(0,625000000000)+
+  ylim(-200,200)+
+  ggtitle("Residual Data Graph")
+```
+
+The first graph is no x and y constraints, but I soon realized that world is an 
+outlier in this so I should probably remove that from the data set next time.  
+Cutting down the x and y to look at the graph lets us see the patterns better 
+in graph 2 and 3.
+
+Looking at these residual graphs based on the gdp, it seems like there might be 
+a pattern in the residual graph which shouldn't be there.  If this model is 
+effective, then we should see a random scattering of dots in the residual graph.
+
+
+Removing world and making this a polynomial equation instead should fit the
+data more and allow for better predictions.  Looking back at the graph of co2 vs
+gdp, you can see that the predicted trend from geom_smooth() doesn't look very 
+linear in the slightest with a good exponential curve in it.
+
+```{r}
+co2.data <- filter(co2.data, country != "world")
+model <- train(co2 ~ ns(gdp, 100), data = tv_data, method = "lm", trControl = train.control)
+
+predictions <- add_predictions(test, model)
+R2(predictions$pred, predictions$co2)
+MAE(predictions$pred, predictions$co2)
+RMSE(predictions$pred, predictions$co2)
+```
+
+Using a polynomial function for making a model seems to produce a much better 
+result than just a linear model.  The R2 value is a lot closer to 1 and MAE/RMSE
+got lower values.
+
+```{r}
+ggplot(data = predictions, mapping=(aes(x = co2, y = pred)))+
+  geom_point(alpha = 0.5)+
+  geom_abline(intercept = 0, slope = 1, color = "red")+
+  ggtitle("Perfect Prediction Outline Graph")
+resid <- add_residuals(test, model)
+ggplot(data = resid, mapping = aes(x=gdp, y=resid))+
+  geom_point(alpha = 0.2)+
+  geom_ref_line(h=0)+
+  ggtitle("Residual Data Graph")
+ggplot(data = resid, mapping = aes(x=gdp, y=resid))+
+  geom_point(alpha = 0.2)+
+  geom_ref_line(h=0)+
+  xlim(0,62500000000)+
+  ylim(-50,50)+
+  ggtitle("Residual Data Graph")
+
+```
+
+Using a polynomial and graphing out the residual/predictions shows that this model
+is getting a much better picture of patterns that can be found in the data
+
+Though I feel like I might be able to get better results with more data including
+renewable energy and maybe some trends of clean energy that different countries 
+are taking. 
+
+
+
+```{r}
+energy.data <- read_csv("clean_energy_data.csv")
+```
+
+energy.data comes from https://www.irena.org/Statistics/View-Data-by-Topic/
+Capacity-and-Generation/Country-Rankings and is maintained on a yearly basis 
+from 2000 until now.  It splits up the data on a source and year level giving 
+us a wide range of angles to look at for renewable energy on a country basis.
+
+This data was grabbed from a .xlsm file through Excel.  It allowed you to query
+the data base from International Renewable Energy Agency with different calls.  I
+I ended up calling the data base looking only at renewable energy made and 
+downloaded the .csv file after
+
+The categorical variables for energy.data are:
+
+* Country/area - 	location on the globe the data is from
+* Technology - source of renewable energy in the power grid
+
+The continuous variables for energy.data are:
+
+* 2000 - electricity generated that year
+* ...
+* 2019 - each year is the same measurements
+
+While this data does have some empty spaces and NULL values in spots, I'm not 
+going to remove those variables.  The main reason I want to keep them is that I 
+need to tidy up the data with the original number of rows first, and filtering 
+isn't too hard later on
+
+Though the .csv file didn't quite fill in all of the country and place names so
+I'm going to have to supplement that and fill out the column.
+
+```{r}
+for (i in 0:4749){
+  if(i %% 19 == 0){
+    word <- toString(energy.data[i+1,1])
+  }else{
+    energy.data[i+1,1] <- word
+  }
+}
+```
+
+
+
