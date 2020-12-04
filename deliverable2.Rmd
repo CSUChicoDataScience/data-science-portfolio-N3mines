@@ -31,12 +31,7 @@ for that topic is quite hard to find.
 
 # Data Science Questions
 
-Looking at this initial data relating to each other with the whole world its co2 
-data, to just looking at the US to find a closer relation, it seems like 
-deforestation might be promising to explore to see if that is more closely related 
-to emissions.
-
-I also want to look into GPD and co2 output as well, i think that they don't have 
+I really want to look into GPD and co2 output, i think that they don't have 
 to be connected, but could also be in close relation when your economy is based 
 off of machinery that isn't the cleanest.  For example a country that has a higher 
 oil co2 release might have a higher GPD and be having more deforestation as well.
@@ -48,11 +43,10 @@ make their way towards a 0 carbon life style.  This might now actually push much
 around though as construction and vehicles are also another big factor in this
 area.
 
-I don't think there are any ethical or social disadvantages to looking into this
-area and digging deeper into relations between the forests of our world and climate 
-change.  If anything, this research will end up pointing fingers and showing the 
-countries that really need to get their act together and push society further along 
-to improve itself.
+A success for me is finding a relation between co2 and gdp that a linear model can
+follow.  I feel like a R2 value above 0.90 is going to sufficient enough to say that
+there was a pattern that was found between the two.  Though better values are always
+good.  If I can I will improve this model with energy or forest data later on.
 
 # Possible Model Topics.
 
@@ -148,11 +142,11 @@ Looking at these residual graphs based on the gdp, it seems like there might be
 a pattern in the residual graph which shouldn't be there.  If this model is 
 effective, then we should see a random scattering of dots in the residual graph.
 
-
 Removing world and making this a polynomial equation instead should fit the
 data more and allow for better predictions.  Looking back at the graph of co2 vs
 gdp, you can see that the predicted trend from geom_smooth() doesn't look very 
-linear in the slightest with a good exponential curve in it.
+linear in the slightest with a good exponential curve in it. A polynomial 
+function should be able to capture the trend seen.
 
 ```{r}
 co2.data <- filter(co2.data, country != "world")
@@ -217,7 +211,7 @@ The categorical variables for energy.data are:
 
 The continuous variables for energy.data are:
 
-* 2000 - electricity generated that year
+* 2000 - clean electricity generated that year
 * ...
 * 2019 - each year is the same measurements
 
@@ -238,6 +232,156 @@ for (i in 0:4749){
   }
 }
 ```
+
+Along with fixing the data, I want to be able to combine the energy data with 
+co2 data so I'm going to have to trim this all down and make it join-able according 
+to the co2 ordering.
+
+```{r}
+
+
+energy.data <- filter(energy.data, Technology == "Total renewable energy")
+energy.data <- select(energy.data, -c(Technology))
+names(energy.data)[1] <- "country"
+names(energy.data)[2] <- "2000"
+names(energy.data)[3] <- "2001"
+names(energy.data)[4] <- "2002"
+names(energy.data)[5] <- "2003"
+names(energy.data)[6] <- "2004"
+names(energy.data)[7] <- "2005"
+names(energy.data)[8] <- "2006"
+names(energy.data)[9] <- "2007"
+names(energy.data)[10] <- "2008"
+names(energy.data)[11] <- "2009"
+names(energy.data)[12] <- "2010"
+names(energy.data)[13] <- "2011"
+names(energy.data)[14] <- "2012"
+names(energy.data)[15] <- "2013"
+names(energy.data)[16] <- "2014"
+names(energy.data)[17] <- "2015"
+names(energy.data)[18] <- "2016"
+names(energy.data)[19] <- "2017"
+names(energy.data)[20] <- "2018"
+names(energy.data)[21] <- "2019"
+energy.data <- select(energy.data, -c('2019'))
+energy.data <- pivot_longer(energy.data ,c('2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018'),names_to = "year", values_to = "total_clean_energy")
+
+energy.data$year <- as.double(energy.data$year)
+for (i in 0:4749){
+  energy.data[i+1,3] <- sub(" ","",toString(energy.data[i+1,3]))
+  energy.data[i+1,3] <- sub(" ","",toString(energy.data[i+1,3]))
+  energy.data[i+1,3] <- sub(" ","",toString(energy.data[i+1,3]))
+}
+energy.data$total_clean_energy <- as.numeric(energy.data$total_clean_energy)
+energy.co2.data <- inner_join(co2.data, energy.data) %>%
+  filter(year > 1999, country != "World", country != "China")
+```
+To combine the two I had to rotate the columns of years to one row, as well as 
+making the clean energy measurements numbers instead of strings.  String wont work
+for models later on.
+
+Filtered out China and World as the data for China is highly debated in the data
+set, and World isn't going to help since it's has such extreme numbers and wont 
+add much to the model.
+
+With the two data sets joined, we can split up the data and try making a linear
+model again but with clean energy involved.  While this data will also be limited
+in the year span, it might still have good results to consider.
+
+```{r}
+ggplot(data = filter(energy.co2.data),  mapping = aes(x=co2, y=total_clean_energy))+
+  geom_point(alpha = 0.2)+
+  ggtitle("C02 vs Clean Energy")
+ggplot(data = filter(energy.co2.data, country == "United States"),  mapping = aes(x=co2, y=total_clean_energy))+
+  geom_point()+
+  ggtitle("C02 vs Clean Energy")
+```
+
+While this data set seems to be somewhat interesting with the correspondence of 
+clean energy having higher co2 output, it seems like the graph is having a rough 
+time graphing it all out.  Though when looking at only the United States, it 
+seems like there might be a good correspondence there with more clean energy 
+resulting in less co2 output.
+
+We are now going to make a basic linear model with gdp and clean energy in mind
+to predict the co2 of a country.  This is also going to take the same data 
+splitting ratio as the model before.
+
+```{r}
+co2.data <- filter(energy.co2.data, gdp != is.na(gdp), co2 != is.na(co2))
+train_rows <- as.vector(createDataPartition(energy.co2.data$co2, p = 0.8, list = FALSE))
+tv_data <- energy.co2.data[train_rows, ]
+test <- energy.co2.data[-train_rows, ]
+
+model <- train(co2 ~ gdp + total_clean_energy, data = tv_data, method = "lm", trControl = train.control)
+
+predictions <- add_predictions(test, model)
+R2(predictions$pred, predictions$co2)
+MAE(predictions$pred, predictions$co2)
+RMSE(predictions$pred, predictions$co2)
+
+```
+
+From the R2 value, this seems to have made a very interesting result and actually
+increased the value of the regular linear model test I first did with just co2 and 
+gdp.  This I did not expect as the graph for co2 and clean energy seems to show 
+both going up at similar rates.
+
+```{r}
+ggplot(data = predictions, mapping=(aes(x = co2, y = pred)))+
+  geom_point(alpha = 0.3)+
+  geom_abline(intercept = 0, slope = 1, color = "red")+
+  ggtitle("Perfect Prediction Outline Graph")
+```
+
+The predictions seem very clumped around the perfect prediction mid-line.  This is
+a very good sign for the model accuracy.
+
+
+```{r}
+resid <- add_residuals(test, model)
+ggplot(data = resid, mapping = aes(x=total_clean_energy, y=resid))+
+  geom_point(alpha = 0.2)+
+  geom_ref_line(h=0)+
+  xlim(0,60000)+
+  ylim(-100,100)+
+  ggtitle("Residual Data Graph")
+resid <- add_residuals(test, model)
+ggplot(data = resid, mapping = aes(x=gdp, y=resid))+
+  geom_point(alpha = 0.2)+
+  geom_ref_line(h=0)+
+  xlim(0,600000000000)+
+  ylim(-100,100)+
+  ggtitle("Residual Data Graph")
+```
+
+Both residual graphs are focused on the chunk of the data ignoring the outliers 
+that exist at very high extremes. Ignoring the outliers though, you can see a 
+trend of under fitting here with the majority of dots being just a tad over the 
+0 line.
+
+It's hard to tell if these results are better than the polynomial data that was
+made earlier, but it does seem to have found a pattern with both variables in this
+case.  The one big thing is that MAE and RMSE are both lower than before making 
+me think this model might be a tad better with error values.
+
+# Wrapping it all up
+
+Overall these models surprised me in multiple ways.  I honesty expected the first
+linear model to work pretty well and didn't see the failure coming.  Though switching
+to the polynomial equation really helped match the curve with a much better result
+than before.  
+
+Grabbing the electrical grid information seemed to make a difference as well
+with the R2 being very similar and error values being lower.
+
+I still don't think there is an ethical or social issue with the research I'm 
+working on.  Any improvement on co2 predictions or help that we can get will help
+society in the long run by getting global warming blame out there.  If the United
+Nations could see the worst countries and act on that, we would probably be able
+to curb the warming.
+
+
 
 
 
